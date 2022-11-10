@@ -2056,7 +2056,6 @@
     "regexCheck": "^[a-zA-Z0-9_]{1,15}$",
     "url": "https://twitter.com/{}",
     "urlMain": "https://twitter.com/",
-    "urlProbe": "https://nitter.net/{}",
     "username_claimed": "blue",
     "username_unclaimed": "noonewouldeveru"
   },
