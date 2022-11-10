@@ -6,11 +6,13 @@ This module contains various utilities for running tests.
 import os
 import os.path
 import unittest
-import sherlock
-from result import QueryStatus
-from notify import QueryNotify
-from sites import SitesInformation
 import warnings
+
+from notify import QueryNotify
+from result import QueryStatus
+from sites import SitesInformation
+
+import sherlock
 
 
 class SherlockBaseTest(unittest.TestCase):

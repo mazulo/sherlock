@@ -5,6 +5,7 @@ This is the raw data that will be used to search for usernames.
 """
 import json
 from typing import Any, Dict, Generator, List, Optional
+
 import requests
 
 

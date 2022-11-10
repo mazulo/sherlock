@@ -40,7 +40,7 @@ class QueryResult:
         site_url_user: str,
         status: QueryStatus,
         query_time: Optional[float] = None,
-        context: Optional[str] = None
+        context: Optional[str] = None,
     ) -> None:
         """
         Create Query Result Object

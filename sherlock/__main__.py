@@ -9,7 +9,6 @@ networks.
 
 import sys
 
-
 if __name__ == "__main__":
     # Check if the user is using the correct version of Python
     python_version = sys.version.split()[0]

@@ -8,26 +8,25 @@ networks.
 """
 
 import csv
-import signal
-import pandas as pd
 import os
 import platform
 import re
-import requests
+import signal
 import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from time import monotonic
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-
-from requests_futures.sessions import FuturesSession
-from torrequest import TorRequest
-from result import QueryStatus
-from result import QueryResult
-from notify import QueryNotifyPrint
-from sherlock.notify import QueryNotify
-from sites import SitesInformation
+import pandas as pd
+import requests
 from colorama import init
+from notify import QueryNotifyPrint
+from requests_futures.sessions import FuturesSession
+from result import QueryResult, QueryStatus
+from sites import SitesInformation
+from torrequest import TorRequest
+
+from sherlock.notify import QueryNotify
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
 __version__ = "0.14.2"
@@ -126,7 +125,9 @@ def get_response(request_future: FuturesSession) -> Tuple[requests.Response, str
     return response, error_context
 
 
-def interpolate_string(target: Union[str, Dict, List], username: str) -> Union[str, Dict, List]:
+def interpolate_string(
+    target: Union[str, Dict, List], username: str
+) -> Union[str, Dict, List]:
     # Insert a string into the string properties of an target recursively
 
     if isinstance(target, str):

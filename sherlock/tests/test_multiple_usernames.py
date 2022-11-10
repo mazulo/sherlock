@@ -1,10 +1,9 @@
 import imp
-import unittest
 import sys
+import unittest
 
 sys.path.append("../")
 import sherlock as sh
-
 
 checksymbols = ["_", "-", "."]
 

@@ -6,8 +6,8 @@ results of queries.
 """
 from typing import Optional
 
-from result import QueryStatus
 from colorama import Fore, Style
+from result import QueryStatus
 
 from .result import QueryResult
 
@@ -90,7 +90,12 @@ class QueryNotifyPrint(QueryNotify):
     Query notify class that prints results.
     """
 
-    def __init__(self, result: Optional[QueryResult] = None, verbose: Optional[bool] = False, print_all: Optional[bool] = False) -> None:
+    def __init__(
+        self,
+        result: Optional[QueryResult] = None,
+        verbose: Optional[bool] = False,
+        print_all: Optional[bool] = False,
+    ) -> None:
         """
         Create Query Notify Print Object
 
@@ -242,7 +247,9 @@ class QueryNotifyPrint(QueryNotify):
                 f"Unknown Query Status '{result.status}' for site '{self.result.site_name}'"
             )
 
-    def finish(self, message: Optional[str] = "The processing has been finished.") -> None:
+    def finish(
+        self, message: Optional[str] = "The processing has been finished."
+    ) -> None:
         """
         Notify finish
 
