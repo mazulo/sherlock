@@ -77,16 +77,6 @@ class QueryNotify:
 
         """
 
-    def __str__(self):
-        """Convert Object To String.
-
-        Arguments:
-
-        Return Value:
-        Nicely formatted string to get information about this object.
-        """
-        return str(self.result)
-
 
 class QueryNotifyPrint(QueryNotify):
     """
@@ -141,38 +131,6 @@ class QueryNotifyPrint(QueryNotify):
         )
         # An empty line between first line and the result(more clear output)
         print("\r")
-
-    def finish(self, message="The processing has been finished."):
-        """
-        Notify Start
-
-        Will print the last line to the standard output.
-
-        Arguments:
-        message                -- The last phrase.
-
-        """
-
-        title = "End"
-
-        print(
-            "\r"
-        )  # An empty line between last line of main output and last line(more clear output)
-        print(
-            Style.BRIGHT
-            + Fore.GREEN
-            + "["
-            + Fore.YELLOW
-            + "!"
-            + Fore.GREEN
-            + f"] {title}"
-            + Fore.GREEN
-            + ": "
-            + Fore.WHITE
-            + f" {message}"
-        )
-
-        # An empty line between first line and the result(more clear output)
 
     def countResults(self):
         """
