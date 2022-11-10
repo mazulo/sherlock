@@ -1,4 +1,5 @@
-"""Sherlock Base Tests
+"""
+Sherlock Base Tests
 
 This module contains various utilities for running tests.
 """
@@ -15,15 +16,9 @@ import warnings
 
 class SherlockBaseTest(unittest.TestCase):
     def setUp(self):
-        """Sherlock Base Test Setup.
-
+        """
+        Sherlock Base Test Setup
         Does common setup tasks for base Sherlock tests.
-
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Nothing.
         """
 
         # This ignores the ResourceWarning from an unclosed SSLSocket.
@@ -65,10 +60,10 @@ class SherlockBaseTest(unittest.TestCase):
         return
 
     def site_data_filter(self, site_list):
-        """Filter Site Data.
+        """
+        Filter Site Data
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         site_list              -- List of strings corresponding to sites which
                                   should be filtered.
 
@@ -89,10 +84,10 @@ class SherlockBaseTest(unittest.TestCase):
         return site_data
 
     def username_check(self, username_list, site_list, exist_check=True):
-        """Username Exist Check.
+        """
+        Username Exist Check
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         username_list          -- List of strings corresponding to usernames
                                   which should exist on *all* of the sites.
         site_list              -- List of strings corresponding to sites which
@@ -101,8 +96,6 @@ class SherlockBaseTest(unittest.TestCase):
                                   a check for Username existence,
                                   or non-existence.
 
-        Return Value:
-        Nothing.
         Will trigger an assert if Username does not have the expected
         existence state.
         """
@@ -146,10 +139,10 @@ class SherlockBaseTest(unittest.TestCase):
         return
 
     def detect_type_check(self, detect_type, exist_check=True):
-        """Username Exist Check.
+        """
+        Username Exist Check
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         detect_type            -- String corresponding to detection algorithm
                                   which is desired to be tested.
                                   Note that only sites which have documented
@@ -159,8 +152,6 @@ class SherlockBaseTest(unittest.TestCase):
                                   a check for Username existence,
                                   or non-existence.
 
-        Return Value:
-        Nothing.
         Runs tests on all sites using the indicated detection algorithm
         and which also has test vectors specified.
         Will trigger an assert if Username does not have the expected
@@ -205,13 +196,8 @@ class SherlockBaseTest(unittest.TestCase):
         return
 
     def coverage_total_check(self):
-        """Total Coverage Check.
-
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Nothing.
+        """
+        Total Coverage Check
         Counts up all Sites with full test data available.
         Will trigger an assert if any Site does not have test coverage.
         """

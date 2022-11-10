@@ -1,6 +1,5 @@
-""" Sherlock Module
+"""
+Sherlock Module
 
-This module contains the main logic to search for usernames at social
-networks.
-
+This module contains the main logic to search for usernames at social networks.
 """

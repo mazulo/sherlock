@@ -33,7 +33,8 @@ __version__ = "0.14.2"
 
 class SherlockFuturesSession(FuturesSession):
     def request(self, method, url, hooks=None, *args, **kwargs):
-        """Request URL.
+        """
+        Request URL
 
         This extends the FuturesSession request method to calculate a response
         time metric to each request.
@@ -41,8 +42,7 @@ class SherlockFuturesSession(FuturesSession):
         It is taken (almost) directly from the following Stack Overflow answer:
         https://github.com/ross/requests-futures#working-in-the-background
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         method                 -- String containing method desired for request.
         url                    -- String containing URL for request.
         hooks                  -- Dictionary containing hooks to execute after
@@ -50,24 +50,22 @@ class SherlockFuturesSession(FuturesSession):
         args                   -- Arguments.
         kwargs                 -- Keyword arguments.
 
-        Return Value:
-        Request object.
+        Return Value: request object
         """
+
         # Record the start time for the request.
         if hooks is None:
             hooks = {}
         start = monotonic()
 
         def response_time(resp, *args, **kwargs):
-            """Response Time Hook.
+            """
+            Response Time Hook
 
-            Keyword Arguments:
+            Arguments:
             resp                   -- Response object.
             args                   -- Arguments.
             kwargs                 -- Keyword arguments.
-
-            Return Value:
-            Nothing.
             """
             resp.elapsed = monotonic() - start
 
@@ -97,7 +95,7 @@ class SherlockFuturesSession(FuturesSession):
 
 
 def get_response(request_future):
-    # Default for Response object if some failure occurs.
+    # Default for Response object if some failure occurs
     response = None
 
     error_context = "General Unknown Error"
@@ -122,7 +120,7 @@ def get_response(request_future):
 
 
 def interpolate_string(object, username):
-    """Insert a string into the string properties of an object recursively."""
+    # Insert a string into the string properties of an object recursively
 
     if isinstance(object, str):
         return object.replace("{}", username)
@@ -137,8 +135,10 @@ def interpolate_string(object, username):
 
 
 def CheckForParameter(username):
-    """checks if {?} exists in the username
-    if exist it means that sherlock is looking for more multiple username"""
+    """
+    Checks if {?} exists in the username
+    if exist it means that sherlock is looking for more multiple username
+    """
     return "{?}" in username
 
 
@@ -146,7 +146,7 @@ checksymbols = ["_", "-", "."]
 
 
 def MultipleUsernames(username):
-    """replace the parameter with with symbols and return a list of usernames"""
+    # Replace the parameter with with symbols and return a list of usernames
     allUsernames = []
     for i in checksymbols:
         allUsernames.append(username.replace("{?}", i))
@@ -162,11 +162,12 @@ def sherlock(
     proxy=None,
     timeout=60,
 ):
-    """Run Sherlock Analysis.
+    """
+    Run Sherlock Analysis
 
     Checks for existence of username on various social media sites.
 
-    Keyword Arguments:
+    Arguments:
     username               -- String indicating username that report
                               should be created against.
     site_data              -- Dictionary containing all of the site data.
@@ -454,11 +455,12 @@ def sherlock(
 
 
 def timeout_check(value):
-    """Check Timeout Argument.
+    """
+    Check Timeout Argument
 
     Checks timeout for validity.
 
-    Keyword Arguments:
+    Arguments:
     value                  -- Time in seconds to wait before timing out request.
 
     Return Value:
@@ -479,7 +481,8 @@ def timeout_check(value):
 
 
 def handler(signal_received, frame):
-    """Exit gracefully without throwing errors
+    """
+    Exit gracefully without throwing errors
 
     Source: https://www.devdungeon.com/content/python-catch-sigint-ctrl-c
     """

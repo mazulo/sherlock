@@ -10,7 +10,8 @@ globvar = 0  # global variable to count the number of results.
 
 
 class QueryNotify:
-    """Query Notify Object.
+    """
+    Query Notify Object
 
     Base class that describes methods available to notify the results of
     a query.
@@ -19,18 +20,15 @@ class QueryNotify:
     """
 
     def __init__(self, result=None):
-        """Create Query Notify Object.
+        """
+        Create Query Notify Object
 
         Contains information about a specific method of notifying the results
         of a query.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         result                 -- Object of type QueryResult() containing
                                   results for this query.
-
-        Return Value:
-        Nothing.
         """
 
         self.result = result
@@ -38,37 +36,33 @@ class QueryNotify:
         # return
 
     def start(self, message=None):
-        """Notify Start.
+        """
+        Notify Start
 
         Notify method for start of query.  This method will be called before
         any queries are performed.  This method will typically be
         overridden by higher level classes that will inherit from it.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         message                -- Object that is used to give context to start
                                   of query.
                                   Default is None.
 
-        Return Value:
-        Nothing.
         """
 
         # return
 
     def update(self, result):
-        """Notify Update.
+        """
+        Notify Update
 
         Notify method for query result.  This method will typically be
         overridden by higher level classes that will inherit from it.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         result                 -- Object of type QueryResult() containing
                                   results for this query.
 
-        Return Value:
-        Nothing.
         """
 
         self.result = result
@@ -82,14 +76,11 @@ class QueryNotify:
         all queries have been performed.  This method will typically be
         overridden by higher level classes that will inherit from it.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         message                -- Object that is used to give context to start
                                   of query.
                                   Default is None.
 
-        Return Value:
-        Nothing.
         """
 
         # return
@@ -97,8 +88,7 @@ class QueryNotify:
     def __str__(self):
         """Convert Object To String.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
 
         Return Value:
         Nicely formatted string to get information about this object.
@@ -107,26 +97,24 @@ class QueryNotify:
 
 
 class QueryNotifyPrint(QueryNotify):
-    """Query Notify Print Object.
-
+    """
+    Query Notify Print Object.
     Query notify class that prints results.
     """
 
     def __init__(self, result=None, verbose=False, print_all=False):
-        """Create Query Notify Print Object.
+        """
+        Create Query Notify Print Object
 
         Contains information about a specific method of notifying the results
         of a query.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         result                 -- Object of type QueryResult() containing
                                   results for this query.
         verbose                -- Boolean indicating whether to give verbose output.
         print_all              -- Boolean indicating whether to only print all sites, including not found.
 
-        Return Value:
-        Nothing.
         """
 
         super().__init__(result)
@@ -136,17 +124,14 @@ class QueryNotifyPrint(QueryNotify):
         return
 
     def start(self, message):
-        """Notify Start.
+        """
+        Notify Start
 
         Will print the title to the standard output.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         message                -- String containing username that the series
                                   of queries are about.
-
-        Return Value:
-        Nothing.
         """
 
         title = "Checking username"
@@ -170,16 +155,14 @@ class QueryNotifyPrint(QueryNotify):
         return
 
     def finish(self, message="The processing has been finished."):
-        """Notify Start.
+        """
+        Notify Start
 
         Will print the last line to the standard output.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         message                -- The last phrase.
 
-        Return Value:
-        Nothing.
         """
 
         title = "End"
@@ -206,11 +189,9 @@ class QueryNotifyPrint(QueryNotify):
         # return
 
     def countResults(self):
-        """This function counts the number of results. Every time the function is called,
-        the number of results is increasing.
-
-        Keyword Arguments:
-        self                   -- This object.
+        """
+        This function counts the number of results. Every time the function is called,
+        the number of results is increasing
 
         Return Value:
         The number of results by the time we call the function.
@@ -220,17 +201,14 @@ class QueryNotifyPrint(QueryNotify):
         return globvar
 
     def update(self, result):
-        """Notify Update.
+        """
+        Notify Update
 
         Will print the query result to the standard output.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         result                 -- Object of type QueryResult() containing
                                   results for this query.
-
-        Return Value:
-        Nothing.
         """
         self.result = result
 
@@ -317,13 +295,13 @@ class QueryNotifyPrint(QueryNotify):
         return
 
     def finish(self, message="The processing has been finished."):
-        """Notify Start.
+        """
+        Notify finish
+
         Will print the last line to the standard output.
-        Keyword Arguments:
-        self                   -- This object.
+
+        Arguments:
         message                -- The 2 last phrases.
-        Return Value:
-        Nothing.
         """
         NumberOfResults = self.countResults() - 1
 
@@ -365,12 +343,9 @@ class QueryNotifyPrint(QueryNotify):
         return
 
     def __str__(self):
-        """Convert Object To String.
+        """
+        Convert Object To String
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Nicely formatted string to get information about this object.
+        Return Value: nicely formatted string to get information about this object
         """
         return str(self.result)

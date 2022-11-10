@@ -1,13 +1,13 @@
-"""Sherlock Result Module
-
+"""
+Sherlock Result Module
 This module defines various objects for recording the results of queries.
 """
 from enum import Enum
 
 
 class QueryStatus(Enum):
-    """Query Status Enumeration.
-
+    """
+    Query Status Enumeration.
     Describes status of query about a given username.
     """
 
@@ -17,13 +17,10 @@ class QueryStatus(Enum):
     ILLEGAL = "Illegal"  # Username Not Allowable For This Site
 
     def __str__(self):
-        """Convert Object To String.
+        """
+        Convert Object To String
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Nicely formatted string to get information about this object.
+        Return Value: nicely formatted string to get information about this object
         """
         return self.value
 
@@ -37,13 +34,13 @@ class QueryResult:
     def __init__(
         self, username, site_name, site_url_user, status, query_time=None, context=None
     ):
-        """Create Query Result Object.
+        """
+        Create Query Result Object
 
         Contains information about a specific method of detecting usernames on
         a given type of web sites.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         username               -- String indicating username that query result
                                   was about.
         site_name              -- String which identifies site.
@@ -60,9 +57,6 @@ class QueryResult:
                                   an error, this might indicate the type of
                                   error that occurred.
                                   Default of None.
-
-        Return Value:
-        Nothing.
         """
 
         self.username = username
@@ -75,13 +69,10 @@ class QueryResult:
         return
 
     def __str__(self):
-        """Convert Object To String.
+        """
+        Convert Object To String
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Nicely formatted string to get information about this object.
+        Return Value: nicely formatted string to get information about this object
         """
         status = str(self.status)
         if self.context is not None:

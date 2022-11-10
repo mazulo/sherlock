@@ -18,12 +18,12 @@ class SiteInformation:
         information,
         is_nsfw,
     ):
-        """Create Site Information Object.
+        """
+        Create Site Information Object
 
         Contains information about a specific website.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         name                   -- String which identifies site.
         url_home               -- String containing URL for home of site.
         url_username_format    -- String containing URL for Username format
@@ -49,9 +49,6 @@ class SiteInformation:
                                          be needed by the detection method,
                                          but it is only recorded in this
                                          object for future use.
-
-        Return Value:
-        Nothing.
         """
 
         self.name = name
@@ -66,13 +63,10 @@ class SiteInformation:
         return
 
     def __str__(self):
-        """Convert Object To String.
+        """
+        Convert Object To String
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Nicely formatted string to get information about this object.
+        Return Value: nicely formatted string to get information about this object
         """
 
         return f"{self.name} ({self.url_home})"
@@ -80,12 +74,12 @@ class SiteInformation:
 
 class SitesInformation:
     def __init__(self, data_file_path=None):
-        """Create Sites Information Object.
+        """
+        Create Sites Information Object
 
         Contains information about all supported websites.
 
-        Keyword Arguments:
-        self                   -- This object.
+        Arguments:
         data_file_path         -- String which indicates path to data file.
                                   The file name must end in ".json".
 
@@ -108,9 +102,6 @@ class SitesInformation:
 
                                   If this option is not specified, then a
                                   default site list will be used.
-
-        Return Value:
-        Nothing.
         """
 
         if not data_file_path:
@@ -125,7 +116,6 @@ class SitesInformation:
                 f"Incorrect JSON file extension for data file '{data_file_path}'."
             )
 
-        # if "http://"  == data_file_path[:7].lower() or "https://" == data_file_path[:8].lower():
         if data_file_path.lower().startswith("http"):
             # Reference is to a URL.
             try:
@@ -189,12 +179,6 @@ class SitesInformation:
     def remove_nsfw_sites(self):
         """
         Remove NSFW sites from the sites, if isNSFW flag is true for site
-
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        None
         """
         sites = {}
         for site in self.sites:
@@ -204,37 +188,28 @@ class SitesInformation:
         self.sites = sites
 
     def site_name_list(self):
-        """Get Site Name List.
+        """
+        Get Site Name List
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        List of strings containing names of sites.
+        Return Value: list of strings containing names of sites
         """
 
         return sorted([site.name for site in self], key=str.lower)
 
     def __iter__(self):
-        """Iterator For Object.
+        """
+        Iterator For Object
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Iterator for sites object.
+        Return Value: iterator for sites object
         """
 
         for site_name in self.sites:
             yield self.sites[site_name]
 
     def __len__(self):
-        """Length For Object.
+        """
+        Length For Object
 
-        Keyword Arguments:
-        self                   -- This object.
-
-        Return Value:
-        Length of sites object.
+        Return Value: length of sites object
         """
         return len(self.sites)
