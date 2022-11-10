@@ -97,12 +97,11 @@ class SherlockFuturesSession(FuturesSession):
                                                            *args, **kwargs)
 
 
-def get_response(request_future, error_type, social_network):
+def get_response(request_future):
     # Default for Response object if some failure occurs.
     response = None
 
     error_context = "General Unknown Error"
-    exception_text = None
     try:
         response = request_future.result()
         if response.status_code:
@@ -110,21 +109,17 @@ def get_response(request_future, error_type, social_network):
             error_context = None
     except requests.exceptions.HTTPError as errh:
         error_context = "HTTP Error"
-        exception_text = str(errh)
     except requests.exceptions.ProxyError as errp:
         error_context = "Proxy Error"
-        exception_text = str(errp)
     except requests.exceptions.ConnectionError as errc:
         error_context = "Error Connecting"
-        exception_text = str(errc)
     except requests.exceptions.Timeout as errt:
         error_context = "Timeout Error"
         exception_text = str(errt)
     except requests.exceptions.RequestException as err:
         error_context = "Unknown Error"
-        exception_text = str(err)
 
-    return response, error_context, exception_text
+    return response, error_context
 
 
 def interpolate_string(object, username):
@@ -148,7 +143,6 @@ def CheckForParameter(username):
     return("{?}" in username)
 
 
-checksymbols = []
 checksymbols = ["_", "-", "."]
 
 
@@ -352,9 +346,7 @@ def sherlock(username, site_data, query_notify,
 
         # Retrieve future and ensure it has finished
         future = net_info["request_future"]
-        r, error_text, exception_text = get_response(request_future=future,
-                                                     error_type=error_type,
-                                                     social_network=social_network)
+        r, error_text = get_response(request_future=future)
 
         # Get response time for response of our request.
         try:
