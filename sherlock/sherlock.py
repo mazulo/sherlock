@@ -89,9 +89,7 @@ class SherlockFuturesSession(FuturesSession):
             # No response hook was already defined, so install it ourselves.
             hooks["response"] = [response_time]
 
-        return super(SherlockFuturesSession, self).request(
-            method, url, hooks=hooks, *args, **kwargs
-        )
+        return super().request(method, url, hooks=hooks, *args, **kwargs)
 
 
 def get_response(request_future):
