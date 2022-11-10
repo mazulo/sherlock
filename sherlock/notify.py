@@ -1,10 +1,15 @@
-"""Sherlock Notify Module
+"""
+Sherlock Notify Module
 
 This module defines the objects for notifying the caller about the
 results of queries.
 """
+from typing import Optional
+
 from result import QueryStatus
 from colorama import Fore, Style
+
+from .result import QueryResult
 
 globvar = 0  # global variable to count the number of results.
 
@@ -19,7 +24,7 @@ class QueryNotify:
     override the methods to implement specific functionality.
     """
 
-    def __init__(self, result=None):
+    def __init__(self, result: Optional[QueryResult] = None) -> None:
         """
         Create Query Notify Object
 
@@ -33,7 +38,7 @@ class QueryNotify:
 
         self.result = result
 
-    def start(self, message=None):
+    def start(self, message: Optional[str] = None) -> None:
         """
         Notify Start
 
@@ -48,7 +53,7 @@ class QueryNotify:
 
         """
 
-    def update(self, result):
+    def update(self, result: QueryResult) -> None:
         """
         Notify Update
 
@@ -63,8 +68,9 @@ class QueryNotify:
 
         self.result = result
 
-    def finish(self, message=None):
-        """Notify Finish.
+    def finish(self, message: Optional[str] = None) -> None:
+        """
+        Notify Finish
 
         Notify method for finish of query.  This method will be called after
         all queries have been performed.  This method will typically be
@@ -84,7 +90,7 @@ class QueryNotifyPrint(QueryNotify):
     Query notify class that prints results.
     """
 
-    def __init__(self, result=None, verbose=False, print_all=False):
+    def __init__(self, result: Optional[QueryResult] = None, verbose: Optional[bool] = False, print_all: Optional[bool] = False) -> None:
         """
         Create Query Notify Print Object
 
@@ -103,7 +109,7 @@ class QueryNotifyPrint(QueryNotify):
         self.verbose = verbose
         self.print_all = print_all
 
-    def start(self, message):
+    def start(self, message: str) -> None:
         """
         Notify Start
 
@@ -132,7 +138,7 @@ class QueryNotifyPrint(QueryNotify):
         # An empty line between first line and the result(more clear output)
         print("\r")
 
-    def countResults(self):
+    def countResults(self) -> int:
         """
         This function counts the number of results. Every time the function is called,
         the number of results is increasing
@@ -144,7 +150,7 @@ class QueryNotifyPrint(QueryNotify):
         globvar += 1
         return globvar
 
-    def update(self, result):
+    def update(self, result: QueryResult) -> None:
         """
         Notify Update
 
@@ -236,7 +242,7 @@ class QueryNotifyPrint(QueryNotify):
                 f"Unknown Query Status '{result.status}' for site '{self.result.site_name}'"
             )
 
-    def finish(self, message="The processing has been finished."):
+    def finish(self, message: Optional[str] = "The processing has been finished.") -> None:
         """
         Notify finish
 
@@ -281,8 +287,9 @@ class QueryNotifyPrint(QueryNotify):
         )
 
         # An empty line between first line and the result(more clear output)
+        print("\r")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert Object To String
 

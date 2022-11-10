@@ -4,20 +4,21 @@ This module supports storing information about websites.
 This is the raw data that will be used to search for usernames.
 """
 import json
+from typing import Any, Dict, Generator, List, Optional
 import requests
 
 
 class SiteInformation:
     def __init__(
         self,
-        name,
-        url_home,
-        url_username_format,
-        username_claimed,
-        username_unclaimed,
-        information,
-        is_nsfw,
-    ):
+        name: str,
+        url_home: str,
+        url_username_format: str,
+        username_claimed: str,
+        username_unclaimed: str,
+        information: Dict[str, Any],
+        is_nsfw: bool,
+    ) -> None:
         """
         Create Site Information Object
 
@@ -60,7 +61,7 @@ class SiteInformation:
         self.information = information
         self.is_nsfw = is_nsfw
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert Object To String
 
@@ -71,7 +72,7 @@ class SiteInformation:
 
 
 class SitesInformation:
-    def __init__(self, data_file_path=None):
+    def __init__(self, data_file_path: Optional[str] = None) -> None:
         """
         Create Sites Information Object
 
@@ -172,7 +173,7 @@ class SitesInformation:
                     f"Problem parsing json contents at '{data_file_path}':  Missing attribute {error}."
                 )
 
-    def remove_nsfw_sites(self):
+    def remove_nsfw_sites(self) -> None:
         """
         Remove NSFW sites from the sites, if isNSFW flag is true for site
         """
@@ -183,7 +184,7 @@ class SitesInformation:
             sites[site] = self.sites[site]
         self.sites = sites
 
-    def site_name_list(self):
+    def site_name_list(self) -> List[str]:
         """
         Get Site Name List
 
@@ -192,7 +193,7 @@ class SitesInformation:
 
         return sorted([site.name for site in self], key=str.lower)
 
-    def __iter__(self):
+    def __iter__(self) -> Generator:
         """
         Iterator For Object
 
@@ -202,7 +203,7 @@ class SitesInformation:
         for site_name in self.sites:
             yield self.sites[site_name]
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Length For Object
 

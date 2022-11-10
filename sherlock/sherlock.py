@@ -13,17 +13,19 @@ import pandas as pd
 import os
 import platform
 import re
+import requests
 import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from time import monotonic
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-import requests
 
 from requests_futures.sessions import FuturesSession
 from torrequest import TorRequest
 from result import QueryStatus
 from result import QueryResult
 from notify import QueryNotifyPrint
+from sherlock.notify import QueryNotify
 from sites import SitesInformation
 from colorama import init
 
@@ -32,7 +34,14 @@ __version__ = "0.14.2"
 
 
 class SherlockFuturesSession(FuturesSession):
-    def request(self, method, url, hooks=None, *args, **kwargs):
+    def request(
+        self,
+        method: str,
+        url: str,
+        hooks: Optional[Dict[str, Callable]] = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         """
         Request URL
 
@@ -92,7 +101,7 @@ class SherlockFuturesSession(FuturesSession):
         return super().request(method, url, hooks=hooks, *args, **kwargs)
 
 
-def get_response(request_future):
+def get_response(request_future: FuturesSession) -> Tuple[requests.Response, str]:
     # Default for Response object if some failure occurs
     response = None
 
@@ -117,22 +126,22 @@ def get_response(request_future):
     return response, error_context
 
 
-def interpolate_string(object, username):
-    # Insert a string into the string properties of an object recursively
+def interpolate_string(target: Union[str, Dict, List], username: str) -> Union[str, Dict, List]:
+    # Insert a string into the string properties of an target recursively
 
-    if isinstance(object, str):
-        return object.replace("{}", username)
-    elif isinstance(object, dict):
-        for key, value in object.items():
-            object[key] = interpolate_string(value, username)
-    elif isinstance(object, list):
-        for i in object:
-            object[i] = interpolate_string(object[i], username)
+    if isinstance(target, str):
+        return target.replace("{}", username)
+    elif isinstance(target, dict):
+        for key, value in target.items():
+            target[key] = interpolate_string(value, username)
+    elif isinstance(target, list):
+        for i in target:
+            target[i] = interpolate_string(target[i], username)
 
-    return object
+    return target
 
 
-def check_for_parameter(username):
+def check_for_parameter(username: str) -> bool:
     """
     Checks if {?} exists in the username
     if exist it means that sherlock is looking for more multiple username
@@ -143,7 +152,7 @@ def check_for_parameter(username):
 checksymbols = ["_", "-", "."]
 
 
-def multiple_usernames(username):
+def multiple_usernames(username: str) -> List[str]:
     # Replace the parameter with with symbols and return a list of usernames
     allUsernames = []
     for i in checksymbols:
@@ -152,14 +161,14 @@ def multiple_usernames(username):
 
 
 def sherlock(
-    username,
-    site_data,
-    query_notify,
-    tor=False,
-    unique_tor=False,
-    proxy=None,
-    timeout=60,
-):
+    username: str,
+    site_data: Dict[str, Any],
+    query_notify: QueryNotify,
+    tor: Optional[bool] = False,
+    unique_tor: Optional[bool] = False,
+    proxy: Optional[str] = None,
+    timeout: Optional[int] = 60,
+) -> Dict[str, Any]:
     """
     Run Sherlock Analysis
 
@@ -452,7 +461,7 @@ def sherlock(
     return results_total
 
 
-def timeout_check(value):
+def timeout_check(value: float) -> float:
     """
     Check Timeout Argument
 
@@ -478,7 +487,7 @@ def timeout_check(value):
     return timeout
 
 
-def handler(signal_received, frame):
+def handler(signal_received: Any, frame: Any) -> None:
     """
     Exit gracefully without throwing errors
 
@@ -487,7 +496,7 @@ def handler(signal_received, frame):
     sys.exit(0)
 
 
-def main():
+def main() -> None:
     version_string = (
         f"%(prog)s {__version__}\n"
         + f"{requests.__description__}:  {requests.__version__}\n"

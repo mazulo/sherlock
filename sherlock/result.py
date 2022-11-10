@@ -3,6 +3,7 @@ Sherlock Result Module
 This module defines various objects for recording the results of queries.
 """
 from enum import Enum
+from typing import Optional
 
 
 class QueryStatus(Enum):
@@ -11,12 +12,12 @@ class QueryStatus(Enum):
     Describes status of query about a given username.
     """
 
-    CLAIMED = "Claimed"  # Username Detected
-    AVAILABLE = "Available"  # Username Not Detected
-    UNKNOWN = "Unknown"  # Error Occurred While Trying To Detect Username
-    ILLEGAL = "Illegal"  # Username Not Allowable For This Site
+    CLAIMED: str = "Claimed"  # Username Detected
+    AVAILABLE: str = "Available"  # Username Not Detected
+    UNKNOWN: str = "Unknown"  # Error Occurred While Trying To Detect Username
+    ILLEGAL: str = "Illegal"  # Username Not Allowable For This Site
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert Object To String
 
@@ -26,14 +27,21 @@ class QueryStatus(Enum):
 
 
 class QueryResult:
-    """Query Result Object.
+    """
+    Query Result Object
 
     Describes result of query about a given username.
     """
 
     def __init__(
-        self, username, site_name, site_url_user, status, query_time=None, context=None
-    ):
+        self,
+        username: str,
+        site_name: str,
+        site_url_user: str,
+        status: QueryStatus,
+        query_time: Optional[float] = None,
+        context: Optional[str] = None
+    ) -> None:
         """
         Create Query Result Object
 
@@ -66,7 +74,7 @@ class QueryResult:
         self.query_time = query_time
         self.context = context
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert Object To String
 
