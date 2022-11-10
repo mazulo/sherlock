@@ -132,7 +132,7 @@ def interpolate_string(object, username):
     return object
 
 
-def CheckForParameter(username):
+def check_for_parameter(username):
     """
     Checks if {?} exists in the username
     if exist it means that sherlock is looking for more multiple username
@@ -143,7 +143,7 @@ def CheckForParameter(username):
 checksymbols = ["_", "-", "."]
 
 
-def MultipleUsernames(username):
+def multiple_usernames(username):
     # Replace the parameter with with symbols and return a list of usernames
     allUsernames = []
     for i in checksymbols:
@@ -750,8 +750,8 @@ def main():
 
     all_usernames = []
     for username in args.username:
-        if CheckForParameter(username):
-            for name in MultipleUsernames(username):
+        if check_for_parameter(username):
+            for name in multiple_usernames(username):
                 all_usernames.append(name)
         else:
             all_usernames.append(username)
