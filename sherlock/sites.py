@@ -60,8 +60,6 @@ class SiteInformation:
         self.information = information
         self.is_nsfw = is_nsfw
 
-        return
-
     def __str__(self):
         """
         Convert Object To String
@@ -173,8 +171,6 @@ class SitesInformation:
                 raise ValueError(
                     f"Problem parsing json contents at '{data_file_path}':  Missing attribute {error}."
                 )
-
-        return
 
     def remove_nsfw_sites(self):
         """

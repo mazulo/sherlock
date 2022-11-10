@@ -8,7 +8,6 @@ import os.path
 import unittest
 import sherlock
 from result import QueryStatus
-from result import QueryResult
 from notify import QueryNotify
 from sites import SitesInformation
 import warnings
@@ -56,8 +55,6 @@ class SherlockBaseTest(unittest.TestCase):
         self.unique_tor = False
         self.timeout = None
         self.skip_error_sites = True
-
-        return
 
     def site_data_filter(self, site_list):
         """
@@ -136,8 +133,6 @@ class SherlockBaseTest(unittest.TestCase):
 
                     self.assertEqual(exist_result_desired, result["status"].status)
 
-        return
-
     def detect_type_check(self, detect_type, exist_check=True):
         """
         Username Exist Check
@@ -193,8 +188,6 @@ class SherlockBaseTest(unittest.TestCase):
         for username, site_list in sites_by_username.items():
             self.username_check([username], site_list, exist_check=exist_check)
 
-        return
-
     def coverage_total_check(self):
         """
         Total Coverage Check
@@ -212,5 +205,3 @@ class SherlockBaseTest(unittest.TestCase):
                 site_no_tests_list.append(site)
 
         self.assertEqual("", ", ".join(site_no_tests_list))
-
-        return

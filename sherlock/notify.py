@@ -33,8 +33,6 @@ class QueryNotify:
 
         self.result = result
 
-        # return
-
     def start(self, message=None):
         """
         Notify Start
@@ -49,8 +47,6 @@ class QueryNotify:
                                   Default is None.
 
         """
-
-        # return
 
     def update(self, result):
         """
@@ -67,8 +63,6 @@ class QueryNotify:
 
         self.result = result
 
-        # return
-
     def finish(self, message=None):
         """Notify Finish.
 
@@ -82,8 +76,6 @@ class QueryNotify:
                                   Default is None.
 
         """
-
-        # return
 
     def __str__(self):
         """Convert Object To String.
@@ -121,8 +113,6 @@ class QueryNotifyPrint(QueryNotify):
         self.verbose = verbose
         self.print_all = print_all
 
-        return
-
     def start(self, message):
         """
         Notify Start
@@ -151,8 +141,6 @@ class QueryNotifyPrint(QueryNotify):
         )
         # An empty line between first line and the result(more clear output)
         print("\r")
-
-        return
 
     def finish(self, message="The processing has been finished."):
         """
@@ -185,8 +173,6 @@ class QueryNotifyPrint(QueryNotify):
         )
 
         # An empty line between first line and the result(more clear output)
-
-        # return
 
     def countResults(self):
         """
@@ -292,8 +278,6 @@ class QueryNotifyPrint(QueryNotify):
                 f"Unknown Query Status '{result.status}' for site '{self.result.site_name}'"
             )
 
-        return
-
     def finish(self, message="The processing has been finished."):
         """
         Notify finish
@@ -339,8 +323,6 @@ class QueryNotifyPrint(QueryNotify):
         )
 
         # An empty line between first line and the result(more clear output)
-
-        return
 
     def __str__(self):
         """
