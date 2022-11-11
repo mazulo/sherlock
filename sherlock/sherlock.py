@@ -12,151 +12,27 @@ import os
 import re
 import signal
 import sys
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from concurrent.futures import Future
-from time import monotonic
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, Optional
 
 import pandas as pd
 import requests
-from colorama import init
+from argument_parser import parser
+from future_session import SherlockFuturesSession
 from notify import QueryNotify, QueryNotifyPrint
-from requests_futures.sessions import FuturesSession
 from result import QueryResult, QueryStatus
 from sites import SitesInformation
 from torrequest import TorRequest
+from utils import (
+    check_for_parameter,
+    get_response,
+    handler,
+    interpolate_string,
+    multiple_usernames,
+)
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
 __version__ = "0.14.2"
-
-
-class SherlockFuturesSession(FuturesSession):
-    def request(
-        self,
-        method: str,
-        url: str,
-        hooks: Optional[Dict[str, Union[List[Callable], Tuple[Callable]]]] = None,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Future:
-        """
-        Request URL
-
-        This extends the FuturesSession request method to calculate a response
-        time metric to each request.
-
-        It is taken (almost) directly from the following Stack Overflow answer:
-        https://github.com/ross/requests-futures#working-in-the-background
-
-        Arguments:
-        method                 -- String containing method desired for request.
-        url                    -- String containing URL for request.
-        hooks                  -- Dictionary containing hooks to execute after
-                                  request finishes.
-        args                   -- Arguments.
-        kwargs                 -- Keyword arguments.
-
-        Return Value: request object
-        """
-
-        # Record the start time for the request.
-        if hooks is None:
-            hooks = {}
-        start = monotonic()
-
-        def response_time(resp, *args, **kwargs):
-            """
-            Response Time Hook
-
-            Arguments:
-            resp                   -- Response object.
-            args                   -- Arguments.
-            kwargs                 -- Keyword arguments.
-            """
-            resp.elapsed = monotonic() - start
-
-            return
-
-        # Install hook to execute when response completes.
-        # Make sure that the time measurement hook is first, so we will not
-        # track any later hook's execution time.
-        try:
-            if isinstance(hooks["response"], list):
-                hooks["response"].insert(0, response_time)
-            elif isinstance(hooks["response"], tuple):
-                # Convert tuple to list and insert time measurement hook first.
-                hooks["response"] = list(hooks["response"])
-                hooks["response"].insert(0, response_time)
-            else:
-                # Must have previously contained a single hook function,
-                # so convert to list.
-                hooks["response"] = [response_time, hooks["response"]]
-        except KeyError:
-            # No response hook was already defined, so install it ourselves.
-            hooks["response"] = [response_time]
-
-        return super().request(method, url, hooks=hooks, *args, **kwargs)
-
-
-def get_response(request_future: Future) -> Tuple[requests.Response, str]:
-    # Default for Response object if some failure occurs
-    response = None
-
-    error_context = "General Unknown Error"
-    try:
-        response = request_future.result()
-        if response.status_code:
-            # Status code exists in response object
-            error_context = None
-    except requests.exceptions.HTTPError:
-        error_context = "HTTP Error"
-    except requests.exceptions.ProxyError:
-        error_context = "Proxy Error"
-    except requests.exceptions.ConnectionError:
-        error_context = "Error Connecting"
-    except requests.exceptions.Timeout:
-        error_context = "Timeout Error"
-    except requests.exceptions.RequestException:
-        error_context = "Unknown Error"
-
-    return response, error_context
-
-
-def interpolate_string(
-    target: Union[str, Dict, List], username: str
-) -> Union[str, Dict, List]:
-    # Insert a string into the string properties of a target recursively
-
-    if isinstance(target, str):
-        return target.replace("{}", username)
-    elif isinstance(target, dict):
-        for key, value in target.items():
-            target[key] = interpolate_string(value, username)
-    elif isinstance(target, list):
-        for i in target:
-            target[i] = interpolate_string(target[i], username)
-
-    return target
-
-
-def check_for_parameter(username: str) -> bool:
-    """
-    Checks if {?} exists in the username
-    if exist it means that sherlock is looking for more multiple username
-    """
-    return "{?}" in username
-
-
-checksymbols = ["_", "-", "."]
-
-
-def multiple_usernames(username: str) -> List[str]:
-    # Replace the parameter with symbols and return a list of usernames
-    all_usernames = []
-
-    for i in checksymbols:
-        all_usernames.append(username.replace("{?}", i))
-    return all_usernames
 
 
 def sherlock(
@@ -221,7 +97,9 @@ def sherlock(
 
     # Create multithreaded session for all requests.
     session = SherlockFuturesSession(
-        max_workers=max_workers, session=underlying_session
+        executor=ThreadPoolExecutor(max_workers=max_workers),
+        max_workers=max_workers,
+        session=underlying_session,
     )
 
     # Results from analysis of all sites
@@ -460,192 +338,8 @@ def sherlock(
     return results_total
 
 
-def timeout_check(value: float) -> float:
-    """
-    Check Timeout Argument
-
-    Checks timeout for validity.
-
-    Arguments:
-    value                  -- Time in seconds to wait before timing out request.
-
-    Return Value:
-    Floating point number representing the time (in seconds) that should be
-    used for the timeout.
-
-    NOTE:  Will raise an exception if the timeout in invalid.
-    """
-    from argparse import ArgumentTypeError
-
-    try:
-        timeout = float(value)
-    except:
-        raise ArgumentTypeError(f"Timeout '{value}' must be a number.")
-    if timeout <= 0:
-        raise ArgumentTypeError(f"Timeout '{value}' must be greater than 0.0s.")
-    return timeout
-
-
-def handler(signal_received: Any, frame: Any) -> None:
-    """
-    Exit gracefully without throwing errors
-
-    Source: https://www.devdungeon.com/content/python-catch-sigint-ctrl-c
-    """
-    sys.exit(0)
-
-
 def main() -> None:
-    version_string = f"🕵️️{module_name} {__version__}"
-
-    parser = ArgumentParser(
-        formatter_class=RawDescriptionHelpFormatter,
-        description=f"{module_name} (Version {__version__})",
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=version_string,
-        help="Display version information and dependencies.",
-    )
-    parser.add_argument(
-        "--verbose",
-        "-v",
-        "-d",
-        "--debug",
-        action="store_true",
-        dest="verbose",
-        default=False,
-        help="Display extra debugging information and metrics.",
-    )
-    parser.add_argument(
-        "--folderoutput",
-        "-fo",
-        dest="folderoutput",
-        help="If using multiple usernames, the output of the results will be saved to this folder.",
-    )
-    parser.add_argument(
-        "--output",
-        "-o",
-        dest="output",
-        help="If using single username, the output of the result will be saved to this file.",
-    )
-    parser.add_argument(
-        "--tor",
-        "-t",
-        action="store_true",
-        dest="tor",
-        default=False,
-        help="Make requests over Tor; increases runtime; requires Tor to be installed and in system path.",
-    )
-    parser.add_argument(
-        "--unique-tor",
-        "-u",
-        action="store_true",
-        dest="unique_tor",
-        default=False,
-        help="Make requests over Tor with new Tor circuit after each request; increases runtime; requires Tor to be installed and in system path.",
-    )
-    parser.add_argument(
-        "--csv",
-        action="store_true",
-        dest="csv",
-        default=False,
-        help="Create Comma-Separated Values (CSV) File.",
-    )
-    parser.add_argument(
-        "--xlsx",
-        action="store_true",
-        dest="xlsx",
-        default=False,
-        help="Create the standard file for the modern Microsoft Excel spreadsheet (xslx).",
-    )
-    parser.add_argument(
-        "--site",
-        action="append",
-        metavar="SITE_NAME",
-        dest="site_list",
-        default=None,
-        help="Limit analysis to just the listed sites. Add multiple options to specify more than one site.",
-    )
-    parser.add_argument(
-        "--proxy",
-        "-p",
-        metavar="PROXY_URL",
-        action="store",
-        dest="proxy",
-        default=None,
-        help="Make requests over a proxy. e.g. socks5://127.0.0.1:1080",
-    )
-    parser.add_argument(
-        "--json",
-        "-j",
-        metavar="JSON_FILE",
-        dest="json_file",
-        default=None,
-        help="Load data from a JSON file or an online, valid, JSON file.",
-    )
-    parser.add_argument(
-        "--timeout",
-        action="store",
-        metavar="TIMEOUT",
-        dest="timeout",
-        type=float,
-        default=60,
-        help="Time (in seconds) to wait for response to requests (Default: 60)",
-    )
-    parser.add_argument(
-        "--print-all",
-        action="store_true",
-        dest="print_all",
-        help="Output sites where the username was not found.",
-    )
-    parser.add_argument(
-        "--print-found",
-        action="store_false",
-        dest="print_all",
-        default=False,
-        help="Output sites where the username was found.",
-    )
-    parser.add_argument(
-        "--no-color",
-        action="store_true",
-        dest="no_color",
-        default=False,
-        help="Don't color terminal output",
-    )
-    parser.add_argument(
-        "username",
-        nargs="+",
-        metavar="USERNAMES",
-        action="store",
-        help="One or more usernames to check with social networks. Check similar usernames using {%%} (replace to '_', '-', '.').",
-    )
-    parser.add_argument(
-        "--browse",
-        "-b",
-        action="store_true",
-        dest="browse",
-        default=False,
-        help="Browse to all results on default browser.",
-    )
-
-    parser.add_argument(
-        "--local",
-        "-l",
-        action="store_true",
-        default=False,
-        help="Force the use of the local data.json file.",
-    )
-
-    parser.add_argument(
-        "--nsfw",
-        action="store_true",
-        default=False,
-        help="Include checking of NSFW sites from default list.",
-    )
-
-    args = parser.parse_args()
+    args = parser()
 
     # If the user presses CTRL-C, exit gracefully without throwing errors
     signal.signal(signal.SIGINT, handler)
@@ -667,39 +361,6 @@ def main() -> None:
 
     except Exception as error:
         print(f"A problem occurred while checking for an update: {error}")
-
-    # Argument check
-    # TODO regex check on args.proxy
-    if args.tor and (args.proxy is not None):
-        raise Exception("Tor and Proxy cannot be set at the same time.")
-
-    # Make prompts
-    if args.proxy is not None:
-        print("Using the proxy: " + args.proxy)
-
-    if args.tor or args.unique_tor:
-        print("Using Tor to make requests")
-
-        print(
-            "Warning: some websites might refuse connecting over Tor, so note that using this option might increase connection errors."
-        )
-
-    if args.no_color:
-        # Disable color output.
-        init(strip=True, convert=False)
-    else:
-        # Enable color output.
-        init(autoreset=True)
-
-    # Check if both output methods are entered as input.
-    if args.output is not None and args.folderoutput is not None:
-        print("You can only use one of the output methods.")
-        sys.exit(1)
-
-    # Check validity for single username output.
-    if args.output is not None and len(args.username) != 1:
-        print("You can only use --output with a single username")
-        sys.exit(1)
 
     # Create object with all information about sites we are aware of.
     try:
