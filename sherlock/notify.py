@@ -4,6 +4,7 @@ Sherlock Notify Module
 This module defines the objects for notifying the caller about the
 results of queries.
 """
+import abc
 from typing import Optional
 
 from colorama import Fore, Style
@@ -12,7 +13,7 @@ from result import QueryResult, QueryStatus
 globvar = 0  # global variable to count the number of results.
 
 
-class QueryNotify:
+class QueryNotify(metaclass=abc.ABCMeta):
     """
     Query Notify Object
 
@@ -36,7 +37,8 @@ class QueryNotify:
 
         self.result = result
 
-    def start(self, message: Optional[str] = None) -> None:
+    @abc.abstractmethod
+    def start(self, message: str) -> None:
         """
         Notify Start
 
@@ -47,10 +49,10 @@ class QueryNotify:
         Arguments:
         message                -- Object that is used to give context to start
                                   of query.
-                                  Default is None.
-
         """
+        raise NotImplementedError
 
+    @abc.abstractmethod
     def update(self, result: QueryResult) -> None:
         """
         Notify Update
@@ -61,11 +63,10 @@ class QueryNotify:
         Arguments:
         result                 -- Object of type QueryResult() containing
                                   results for this query.
-
         """
+        raise NotImplementedError
 
-        self.result = result
-
+    @abc.abstractmethod
     def finish(self, message: Optional[str] = None) -> None:
         """
         Notify Finish
@@ -78,8 +79,8 @@ class QueryNotify:
         message                -- Object that is used to give context to start
                                   of query.
                                   Default is None.
-
         """
+        raise NotImplementedError
 
 
 class QueryNotifyPrint(QueryNotify):
@@ -141,7 +142,7 @@ class QueryNotifyPrint(QueryNotify):
         # An empty line between first line and the result(more clear output)
         print("\r")
 
-    def countResults(self) -> int:
+    def count_results(self) -> int:
         """
         This function counts the number of results. Every time the function is called,
         the number of results is increasing
@@ -171,7 +172,7 @@ class QueryNotifyPrint(QueryNotify):
 
         # Output to the terminal is desired.
         if result.status == QueryStatus.CLAIMED:
-            self.countResults()
+            self.count_results()
             print(
                 Style.BRIGHT
                 + Fore.WHITE
@@ -256,7 +257,7 @@ class QueryNotifyPrint(QueryNotify):
         Arguments:
         message                -- The 2 last phrases.
         """
-        NumberOfResults = self.countResults() - 1
+        number_of_results = self.count_results() - 1
 
         title = "Results:"
 
@@ -269,7 +270,7 @@ class QueryNotifyPrint(QueryNotify):
             + Fore.GREEN
             + f"] {title}"
             + Fore.WHITE
-            + f" {NumberOfResults}"
+            + f" {number_of_results}"
         )
 
         title = "End"
