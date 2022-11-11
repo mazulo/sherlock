@@ -9,24 +9,22 @@ networks.
 
 import csv
 import os
-import platform
 import re
 import signal
 import sys
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from concurrent.futures import Future
 from time import monotonic
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import requests
 from colorama import init
-from notify import QueryNotifyPrint
+from notify import QueryNotify, QueryNotifyPrint
 from requests_futures.sessions import FuturesSession
 from result import QueryResult, QueryStatus
 from sites import SitesInformation
 from torrequest import TorRequest
-
-from sherlock.notify import QueryNotify
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
 __version__ = "0.14.2"
@@ -37,10 +35,10 @@ class SherlockFuturesSession(FuturesSession):
         self,
         method: str,
         url: str,
-        hooks: Optional[Dict[str, Callable]] = None,
+        hooks: Optional[Dict[str, Union[List[Callable], Tuple[Callable]]]] = None,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ) -> Future:
         """
         Request URL
 
@@ -100,7 +98,7 @@ class SherlockFuturesSession(FuturesSession):
         return super().request(method, url, hooks=hooks, *args, **kwargs)
 
 
-def get_response(request_future: FuturesSession) -> Tuple[requests.Response, str]:
+def get_response(request_future: Future) -> Tuple[requests.Response, str]:
     # Default for Response object if some failure occurs
     response = None
 
@@ -110,16 +108,15 @@ def get_response(request_future: FuturesSession) -> Tuple[requests.Response, str
         if response.status_code:
             # Status code exists in response object
             error_context = None
-    except requests.exceptions.HTTPError as errh:
+    except requests.exceptions.HTTPError:
         error_context = "HTTP Error"
-    except requests.exceptions.ProxyError as errp:
+    except requests.exceptions.ProxyError:
         error_context = "Proxy Error"
-    except requests.exceptions.ConnectionError as errc:
+    except requests.exceptions.ConnectionError:
         error_context = "Error Connecting"
-    except requests.exceptions.Timeout as errt:
+    except requests.exceptions.Timeout:
         error_context = "Timeout Error"
-        exception_text = str(errt)
-    except requests.exceptions.RequestException as err:
+    except requests.exceptions.RequestException:
         error_context = "Unknown Error"
 
     return response, error_context
@@ -128,7 +125,7 @@ def get_response(request_future: FuturesSession) -> Tuple[requests.Response, str
 def interpolate_string(
     target: Union[str, Dict, List], username: str
 ) -> Union[str, Dict, List]:
-    # Insert a string into the string properties of an target recursively
+    # Insert a string into the string properties of a target recursively
 
     if isinstance(target, str):
         return target.replace("{}", username)
@@ -154,11 +151,12 @@ checksymbols = ["_", "-", "."]
 
 
 def multiple_usernames(username: str) -> List[str]:
-    # Replace the parameter with with symbols and return a list of usernames
-    allUsernames = []
+    # Replace the parameter with symbols and return a list of usernames
+    all_usernames = []
+
     for i in checksymbols:
-        allUsernames.append(username.replace("{?}", i))
-    return allUsernames
+        all_usernames.append(username.replace("{?}", i))
+    return all_usernames
 
 
 def sherlock(
@@ -178,7 +176,7 @@ def sherlock(
     Arguments:
     username               -- String indicating username that report
                               should be created against.
-    site_data              -- Dictionary containing all of the site data.
+    site_data              -- Dictionary containing all the site data.
     query_notify           -- Object with base type of QueryNotify().
                               This will be used to notify the caller about
                               query results.
@@ -198,7 +196,7 @@ def sherlock(
                        account existence.
         http_status:   HTTP status code of query which checked for existence on
                        site.
-        response_text: Text that came back from request.  May be None if
+        response_text: Text that came back from request. It may be None if
                        there was an HTTP error when checking for existence.
     """
 
@@ -221,7 +219,7 @@ def sherlock(
     else:
         max_workers = len(site_data)
 
-    # Create multi-threaded session for all requests.
+    # Create multithreaded session for all requests.
     session = SherlockFuturesSession(
         max_workers=max_workers, session=underlying_session
     )
@@ -299,14 +297,14 @@ def sherlock(
                     # detect fine with just the HEAD response.
                     request = session.head
                 else:
-                    # Either this detect method needs the content associated
+                    # Either this detects method needs the content associated
                     # with the GET response, or this specific website will
                     # not respond properly unless we request the whole page.
                     request = session.get
 
             if net_info["errorType"] == "response_url":
                 # Site forwards request to a different URL if username not
-                # found.  Disallow the redirect so we can capture the
+                # found.  Disallow the redirect, so we can capture the
                 # http status from the original URL request.
                 allow_redirects = False
             else:
@@ -345,7 +343,7 @@ def sherlock(
         results_total[social_network] = results_site
 
     # Open the file containing account links
-    # Core logic: If tor requests, make them here. If multi-threaded requests, wait for responses
+    # Core logic: If tor requests, make them here. If multithreaded requests, wait for responses
     for social_network, net_info in site_data.items():
 
         # Retrieve results again
@@ -375,11 +373,11 @@ def sherlock(
         # Attempt to get request information
         try:
             http_status = r.status_code
-        except:
+        except AttributeError:
             http_status = "?"
         try:
             response_text = r.text.encode(r.encoding or "UTF-8")
-        except:
+        except AttributeError:
             response_text = ""
 
         query_status = QueryStatus.UNKNOWN
@@ -456,7 +454,7 @@ def sherlock(
         results_site["http_status"] = http_status
         results_site["response_text"] = response_text
 
-        # Add this site's results into final dictionary with all of the other results.
+        # Add this site's results into final dictionary with all the other results.
         results_total[social_network] = results_site
 
     return results_total
@@ -498,11 +496,7 @@ def handler(signal_received: Any, frame: Any) -> None:
 
 
 def main() -> None:
-    version_string = (
-        f"%(prog)s {__version__}\n"
-        + f"{requests.__description__}:  {requests.__version__}\n"
-        + f"Python:  {platform.python_version()}"
-    )
+    version_string = f"🕵️️{module_name} {__version__}"
 
     parser = ArgumentParser(
         formatter_class=RawDescriptionHelpFormatter,
@@ -596,7 +590,7 @@ def main() -> None:
         action="store",
         metavar="TIMEOUT",
         dest="timeout",
-        type=timeout_check,
+        type=float,
         default=60,
         help="Time (in seconds) to wait for response to requests (Default: 60)",
     )
@@ -668,7 +662,7 @@ def main() -> None:
         if remote_version != local_version:
             print(
                 "Update Available!\n"
-                + f"You are running version {local_version}. Version {remote_version} is available at https://github.com/sherlock-project/sherlock"
+                f"You are running version {local_version}. Version {remote_version} is available at https://github.com/sherlock-project/sherlock"
             )
 
     except Exception as error:
@@ -842,11 +836,7 @@ def main() -> None:
             response_time_s = []
 
             for site in results:
-
-                if response_time_s is None:
-                    response_time_s.append("")
-                else:
-                    response_time_s.append(results[site]["status"].query_time)
+                response_time_s.append(results[site]["status"].query_time)
                 usernames.append(username)
                 names.append(site)
                 url_main.append(results[site]["url_main"])
@@ -854,7 +844,7 @@ def main() -> None:
                 exists.append(str(results[site]["status"].status))
                 http_status.append(results[site]["http_status"])
 
-            DataFrame = pd.DataFrame(
+            data_frame = pd.DataFrame(
                 {
                     "username": usernames,
                     "name": names,
@@ -865,9 +855,7 @@ def main() -> None:
                     "response_time_s": response_time_s,
                 }
             )
-            DataFrame.to_excel(f"{username}.xlsx", sheet_name="sheet1", index=False)
-
-        print()
+            data_frame.to_excel(f"{username}.xlsx", sheet_name="sheet1", index=False)
     query_notify.finish()
 
 

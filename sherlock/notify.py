@@ -7,9 +7,7 @@ results of queries.
 from typing import Optional
 
 from colorama import Fore, Style
-from result import QueryStatus
-
-from .result import QueryResult
+from result import QueryResult, QueryStatus
 
 globvar = 0  # global variable to count the number of results.
 

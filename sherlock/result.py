@@ -38,7 +38,7 @@ class QueryResult:
         username: str,
         site_name: str,
         site_url_user: str,
-        status: QueryStatus,
+        status: str,
         query_time: Optional[float] = None,
         context: Optional[str] = None,
     ) -> None:
@@ -80,7 +80,7 @@ class QueryResult:
 
         Return Value: nicely formatted string to get information about this object
         """
-        status = str(self.status)
+        status = self.status
         if self.context is not None:
             # There is extra context information available about the results.
             # Append it to the normal response text.
