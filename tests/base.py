@@ -116,7 +116,12 @@ class SherlockBaseTest(unittest.TestCase):
             )
             for site, result in results.items():
                 with self.subTest(f"Checking Username '{username}' " f"{check_type_text} on Site '{site}'"):
-                    if self.skip_error_sites and result["status"].status in (QueryStatus.UNKNOWN, QueryStatus.ILLEGAL):
+                    skip_test = (
+                        self.skip_error_sites
+                        and result["status"].status in (QueryStatus.UNKNOWN, QueryStatus.ILLEGAL)
+                        or result["http_status"] > 200
+                    )
+                    if skip_test:
                         # Some error connecting to site.
                         self.skipTest(
                             f"Skipping Username '{username}' "

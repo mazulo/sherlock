@@ -29,9 +29,7 @@ def get_response(request_future: Future) -> Tuple[requests.Response, str]:
     return response, error_context
 
 
-def interpolate_string(
-    target: Union[str, Dict, List], username: str
-) -> Union[str, Dict, List]:
+def interpolate_string(target: Union[str, Dict, List], username: str) -> Union[str, Dict, List]:
     # Insert a string into the string properties of a target recursively
 
     if isinstance(target, str):
@@ -83,7 +81,7 @@ def timeout_check(value: str) -> float:
 
     try:
         timeout = float(value)
-    except:
+    except Exception:
         raise ArgumentTypeError(f"Timeout '{value}' must be a number.")
     if timeout <= 0:
         raise ArgumentTypeError(f"Timeout '{value}' must be greater than 0.0s.")

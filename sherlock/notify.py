@@ -168,7 +168,7 @@ class QueryNotifyPrint(QueryNotify):
         self.result = result
 
         response_time_text = ""
-        if self.result.query_time is not None and self.verbose == True:
+        if self.result.query_time is not None and self.verbose:
             response_time_text = f" [{round(self.result.query_time * 1000)}ms]"
 
         # Output to the terminal is desired.
@@ -221,7 +221,6 @@ class QueryNotifyPrint(QueryNotify):
                     + Fore.RED
                     + f" {self.result.context}"
                     + Fore.YELLOW
-                    + f" "
                 )
 
         elif result.status == QueryStatus.ILLEGAL:
@@ -243,13 +242,9 @@ class QueryNotifyPrint(QueryNotify):
 
         else:
             # It should be impossible to ever get here...
-            raise ValueError(
-                f"Unknown Query Status '{result.status}' for site '{self.result.site_name}'"
-            )
+            raise ValueError(f"Unknown Query Status '{result.status}' for site '{self.result.site_name}'")
 
-    def finish(
-        self, message: Optional[str] = "The processing has been finished."
-    ) -> None:
+    def finish(self, message: Optional[str] = "The processing has been finished.") -> None:
         """
         Notify finish
 
@@ -276,9 +271,7 @@ class QueryNotifyPrint(QueryNotify):
 
         title = "End"
 
-        print(
-            "\r"
-        )  # An empty line between last line of main output and last line(more clear output)
+        print("\r")  # An empty line between last line of main output and last line(more clear output)
         print(
             Style.BRIGHT
             + Fore.GREEN

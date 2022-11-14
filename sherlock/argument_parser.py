@@ -58,7 +58,10 @@ def parser() -> Namespace:
         action="store_true",
         dest="unique_tor",
         default=False,
-        help="Make requests over Tor with new Tor circuit after each request; increases runtime; requires Tor to be installed and in system path.",
+        help=(
+            "Make requests over Tor with new Tor circuit after each request;"
+            " increases runtime; requires Tor to be installed and in system path."
+        ),
     )
     parser.add_argument(
         "--csv",
@@ -133,7 +136,10 @@ def parser() -> Namespace:
         nargs="+",
         metavar="USERNAMES",
         action="store",
-        help="One or more usernames to check with social networks. Check similar usernames using {%%} (replace to '_', '-', '.').",
+        help=(
+            "One or more usernames to check with social networks."
+            " Check similar usernames using {%%} (replace to '_', '-', '.')."
+        ),
     )
     parser.add_argument(
         "--browse",
@@ -174,7 +180,8 @@ def parser() -> Namespace:
         print("Using Tor to make requests")
 
         print(
-            "Warning: some websites might refuse connecting over Tor, so note that using this option might increase connection errors."
+            "Warning: some websites might refuse connecting over Tor,"
+            " so note that using this option might increase connection errors."
         )
 
     if args.no_color:

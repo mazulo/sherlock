@@ -32,10 +32,10 @@ from .utils import (
 )
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
-__version__ = "0.15.0"
+__version__ = "0.15.1"
 
 
-def sherlock(
+def sherlock(  # noqa: C901
     username: str,
     site_data: Dict[str, Any],
     query_notify: QueryNotify,
@@ -130,9 +130,7 @@ def sherlock(
         regex_check = net_info.get("regexCheck")
         if regex_check and re.search(regex_check, username) is None:
             # No need to do the check at the site: this username is not allowed.
-            results_site["status"] = QueryResult(
-                username, social_network, url, QueryStatus.ILLEGAL
-            )
+            results_site["status"] = QueryResult(username, social_network, url, QueryStatus.ILLEGAL)
             results_site["url_user"] = ""
             results_site["http_status"] = ""
             results_site["response_text"] = ""
@@ -310,9 +308,7 @@ def sherlock(
                 query_status = QueryStatus.AVAILABLE
         else:
             # It should be impossible to ever get here...
-            raise ValueError(
-                f"Unknown Error Type '{error_type}' for " f"site '{social_network}'"
-            )
+            raise ValueError(f"Unknown Error Type '{error_type}' for " f"site '{social_network}'")
 
         # Notify caller about results of query.
         result = QueryResult(
@@ -338,7 +334,7 @@ def sherlock(
     return results_total
 
 
-def main() -> None:
+def main() -> None:  # noqa: C901
     args = parser()
 
     # If the user presses CTRL-C, exit gracefully without throwing errors
@@ -346,9 +342,7 @@ def main() -> None:
 
     # Check for newer version of Sherlock. If it exists, let the user know about it
     try:
-        r = requests.get(
-            "https://raw.githubusercontent.com/sherlock-project/sherlock/master/sherlock/sherlock.py"
-        )
+        r = requests.get("https://raw.githubusercontent.com/mazulo/sherlock/master/sherlock/sherlock.py")
 
         remote_version = str(re.findall('__version__ = "(.*)"', r.text)[0])
         local_version = __version__
@@ -356,7 +350,8 @@ def main() -> None:
         if remote_version != local_version:
             print(
                 "Update Available!\n"
-                f"You are running version {local_version}. Version {remote_version} is available at https://github.com/sherlock-project/sherlock"
+                f"You are running version {local_version}. "
+                f"Version {remote_version} is available at https://github.com/mazulo/sherlock"
             )
 
     except Exception as error:
@@ -365,9 +360,7 @@ def main() -> None:
     # Create object with all information about sites we are aware of.
     try:
         if args.local:
-            sites = SitesInformation(
-                os.path.join(os.path.dirname(__file__), "resources/data.json")
-            )
+            sites = SitesInformation(use_local_file=True)
         else:
             sites = SitesInformation(args.json_file)
     except Exception as error:
@@ -407,9 +400,7 @@ def main() -> None:
             sys.exit(1)
 
     # Create notify object for query results.
-    query_notify = QueryNotifyPrint(
-        result=None, verbose=args.verbose, print_all=args.print_all
-    )
+    query_notify = QueryNotifyPrint(result=None, verbose=args.verbose, print_all=args.print_all)
 
     # Run report on all specified users.
 

@@ -45,8 +45,8 @@ setup(
     description="Sherlock: Find Usernames Across Social Networks",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_packages(exclude=['tests*']),
-    entry_points={'console_scripts': ['sherlock = sherlock.sherlock:main']},
+    packages=find_packages(exclude=["tests*"]),
+    entry_points={"console_scripts": ["sherlock = sherlock.sherlock:main"]},
     install_requires=[
         "certifi>=2019.6.16",
         "colorama>=0.4.1",

@@ -23,7 +23,7 @@ class QueryStatus(Enum):
 
         Return Value: nicely formatted string to get information about this object
         """
-        return self.value
+        return str(self.value)
 
 
 class QueryResult:

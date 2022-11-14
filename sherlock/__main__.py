@@ -21,5 +21,4 @@ if __name__ == "__main__":
         print(f"You are using Python {python_version}, which is not supported by Sherlock")
         sys.exit(1)
 
-
     main()

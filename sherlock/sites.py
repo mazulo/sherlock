@@ -4,6 +4,7 @@ This module supports storing information about websites.
 This is the raw data that will be used to search for usernames.
 """
 import json
+import pathlib
 from typing import Any, Dict, Generator, List, Optional
 
 import requests
@@ -73,7 +74,7 @@ class SiteInformation:
 
 
 class SitesInformation:
-    def __init__(self, data_file_path: Optional[str] = None) -> None:
+    def __init__(self, use_local_file: Optional[bool] = False) -> None:
         """
         Create Sites Information Object
 
@@ -104,55 +105,7 @@ class SitesInformation:
                                   default site list will be used.
         """
 
-        if not data_file_path:
-            # The default data file is the live data.json which is in the GitHub repo. The reason why we are using
-            # this instead of the local one is so that the user has the most up-to-date data. This prevents
-            # users from creating issue about false positives which has already been fixed or having outdated data
-            data_file_path = "https://raw.githubusercontent.com/sherlock-project/sherlock/master/sherlock/resources/data.json"
-
-        # Ensure that specified data file has correct extension.
-        if not data_file_path.lower().endswith(".json"):
-            raise FileNotFoundError(
-                f"Incorrect JSON file extension for data file '{data_file_path}'."
-            )
-
-        if data_file_path.lower().startswith("http"):
-            # Reference is to a URL.
-            try:
-                response = requests.get(url=data_file_path)
-            except Exception as error:
-                raise FileNotFoundError(
-                    f"Problem while attempting to access data file URL '{data_file_path}':  {error}"
-                )
-
-            if response.status_code != 200:
-                raise FileNotFoundError(
-                    f"Bad response while accessing "
-                    f"data file URL '{data_file_path}'."
-                )
-            try:
-                site_data = response.json()
-            except Exception as error:
-                raise ValueError(
-                    f"Problem parsing json contents at '{data_file_path}':  {error}."
-                )
-
-        else:
-            # Reference is to a file.
-            try:
-                with open(data_file_path, "r", encoding="utf-8") as file:
-                    try:
-                        site_data = json.load(file)
-                    except Exception as error:
-                        raise ValueError(
-                            f"Problem parsing json contents at '{data_file_path}':  {error}."
-                        )
-
-            except FileNotFoundError:
-                raise FileNotFoundError(
-                    f"Problem while attempting to access "
-                    f"data file '{data_file_path}'."
-                )
+        site_data = self.__generate_site_data(use_local_file)
 
         self.sites = {}
 
@@ -170,9 +123,50 @@ class SitesInformation:
                     site_data[site_name].get("isNSFW", False),
                 )
             except KeyError as error:
-                raise ValueError(
-                    f"Problem parsing json contents at '{data_file_path}':  Missing attribute {error}."
+                raise ValueError(f"Problem parsing json contents:  Missing attribute {error}.")
+
+    def __generate_site_data(self, use_local_file: Optional[bool] = False) -> Dict[str, Any]:  # noqa: C901
+        site_data = {}
+        if not use_local_file:
+            # The default data file is the live data.json which is in the GitHub repo. The reason why we are using
+            # this instead of the local one is so that the user has the most up-to-date data. This prevents
+            # users from creating issue about false positives which has already been fixed or having outdated data
+            data_file_path = (
+                "https://raw.githubusercontent.com/mazulo/sherlock/master/sherlock/resources/data.json"
+            )
+            try:
+                response = requests.get(url=data_file_path)
+            except Exception as error:
+                raise FileNotFoundError(
+                    f"Problem while attempting to access data file URL '{data_file_path}':  {error}"
                 )
+
+            if response.status_code != 200:
+                raise FileNotFoundError(f"Bad response while accessing " f"data file URL '{data_file_path}'.")
+            try:
+                site_data = response.json()
+            except Exception as error:
+                raise ValueError(f"Problem parsing json contents at '{data_file_path}':  {error}.")
+        else:
+            resouces_dir = pathlib.Path(__file__).parents[0] / "resources"
+            data_json_file = resouces_dir / "data.json"
+
+            # Ensure that specified data file has correct extension.
+            if not data_json_file.as_posix().lower().endswith(".json"):
+                raise FileNotFoundError(f"Incorrect JSON file extension for data file '{data_json_file}'.")
+            else:
+                # Reference is to a file.
+                try:
+                    with open(data_json_file, "r", encoding="utf-8") as file:
+                        try:
+                            site_data = json.load(file)
+                        except Exception as error:
+                            raise ValueError(f"Problem parsing json contents at '{data_json_file}':  {error}.")
+
+                except FileNotFoundError:
+                    raise FileNotFoundError(f"Problem while attempting to access " f"data file '{data_json_file}'.")
+
+        return site_data
 
     def remove_nsfw_sites(self) -> None:
         """
