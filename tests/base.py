@@ -8,11 +8,11 @@ import os.path
 import unittest
 import warnings
 
-from notify import QueryNotify
-from result import QueryStatus
-from sites import SitesInformation
+from sherlock.notify import QueryNotifyPrint
+from sherlock.result import QueryStatus
+from sherlock.sites import SitesInformation
 
-import sherlock
+from sherlock import sherlock
 
 
 class SherlockBaseTest(unittest.TestCase):
@@ -27,7 +27,7 @@ class SherlockBaseTest(unittest.TestCase):
         warnings.simplefilter("ignore", ResourceWarning)
 
         # Create object with all information about sites we are aware of.
-        sites = SitesInformation()
+        sites = SitesInformation(use_local_file=True)
 
         # Create original dictionary from SitesInformation() object.
         # Eventually, the rest of the code will be updated to use the new object
@@ -43,15 +43,13 @@ class SherlockBaseTest(unittest.TestCase):
             "tests/.excluded_sites",
         )
         try:
-            with open(
-                excluded_sites_path, "r", encoding="utf-8"
-            ) as excluded_sites_file:
+            with open(excluded_sites_path, "r", encoding="utf-8") as excluded_sites_file:
                 self.excluded_sites = excluded_sites_file.read().splitlines()
         except FileNotFoundError:
             self.excluded_sites = []
 
         # Create notify object for query results.
-        self.query_notify = QueryNotify()
+        self.query_notify = QueryNotifyPrint()
 
         self.tor = False
         self.unique_tor = False
@@ -75,9 +73,7 @@ class SherlockBaseTest(unittest.TestCase):
         # an error.
         site_data = {}
         for site in site_list:
-            with self.subTest(
-                f"Checking test vector Site '{site}' " f"exists in total site data."
-            ):
+            with self.subTest(f"Checking test vector Site '{site}' " f"exists in total site data."):
                 site_data[site] = self.site_data_all[site]
 
         return site_data
@@ -119,13 +115,8 @@ class SherlockBaseTest(unittest.TestCase):
                 timeout=self.timeout,
             )
             for site, result in results.items():
-                with self.subTest(
-                    f"Checking Username '{username}' "
-                    f"{check_type_text} on Site '{site}'"
-                ):
-                    if (self.skip_error_sites == True) and (
-                        result["status"].status == QueryStatus.UNKNOWN
-                    ):
+                with self.subTest(f"Checking Username '{username}' " f"{check_type_text} on Site '{site}'"):
+                    if self.skip_error_sites and result["status"].status in (QueryStatus.UNKNOWN, QueryStatus.ILLEGAL):
                         # Some error connecting to site.
                         self.skipTest(
                             f"Skipping Username '{username}' "
@@ -149,7 +140,7 @@ class SherlockBaseTest(unittest.TestCase):
                                   a check for Username existence,
                                   or non-existence.
 
-        Runs tests on all sites using the indicated detection algorithm
+        Runs all the tests on all sites using the indicated detection algorithm
         and which also has test vectors specified.
         Will trigger an assert if Username does not have the expected
         existence state.
@@ -186,7 +177,7 @@ class SherlockBaseTest(unittest.TestCase):
                 else:
                     sites_by_username[username] = [site]
 
-        # Check on the username availability against all of the sites.
+        # Check on the username availability against all the sites.
         for username, site_list in sites_by_username.items():
             self.username_check([username], site_list, exist_check=exist_check)
 
@@ -200,9 +191,7 @@ class SherlockBaseTest(unittest.TestCase):
         site_no_tests_list = []
 
         for site, site_data in self.site_data_all.items():
-            if (site_data.get("username_claimed") is None) or (
-                site_data.get("username_unclaimed") is None
-            ):
+            if (site_data.get("username_claimed") is None) or (site_data.get("username_unclaimed") is None):
                 # Test information not available on this site.
                 site_no_tests_list.append(site)
 

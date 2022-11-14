@@ -3,8 +3,6 @@ Sherlock Tests
 
 This module contains various tests.
 """
-import unittest
-
 from tests.base import SherlockBaseTest
 
 
@@ -43,9 +41,7 @@ class SherlockDetectTests(SherlockBaseTest):
         # Ensure that the site's detection method has not changed.
         self.assertEqual("message", site_data["errorType"])
 
-        self.username_check(
-            [site_data["username_unclaimed"]], [site], exist_check=False
-        )
+        self.username_check([site_data["username_unclaimed"]], [site], exist_check=False)
 
     def test_detect_true_via_status_code(self):
         """
@@ -81,9 +77,7 @@ class SherlockDetectTests(SherlockBaseTest):
         # Ensure that the site's detection method has not changed.
         self.assertEqual("status_code", site_data["errorType"])
 
-        self.username_check(
-            [site_data["username_unclaimed"]], [site], exist_check=False
-        )
+        self.username_check([site_data["username_unclaimed"]], [site], exist_check=False)
 
     def test_detect_true_via_response_url(self):
         """
@@ -119,9 +113,7 @@ class SherlockDetectTests(SherlockBaseTest):
         # Ensure that the site's detection method has not changed.
         self.assertEqual("response_url", site_data["errorType"])
 
-        self.username_check(
-            [site_data["username_unclaimed"]], [site], exist_check=False
-        )
+        self.username_check([site_data["username_unclaimed"]], [site], exist_check=False)
 
 
 class SherlockSiteCoverageTests(SherlockBaseTest):
