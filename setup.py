@@ -36,7 +36,7 @@ class TestCommand(Command):
 
 setup(
     cmdclass={"test": TestCommand},
-    name="sherlock",
+    name="sherlock-hunt",
     version=__version__,
     url="https://github.com/mazulo/sherlock",
     download_url=f"https://github.com/mazulo/sherlock/tarball/{__version__}",

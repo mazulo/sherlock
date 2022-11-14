@@ -1,8 +1,8 @@
 [project]
-name = "sherlock"
+name = "sherlock-hunt"
 version = "0.14.2"
 description = "Sherlock: Find Usernames Across Social Networks"
-license = "MIT License"
+license = {text = "MIT License"}
 readme = "README.md"
 classifiers = [
     "License :: OSI Approved :: MIT License",
