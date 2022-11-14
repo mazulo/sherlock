@@ -1,6 +1,6 @@
 [project]
 name = "sherlock-hunt"
-version = "0.15.1"
+version = "0.15.2"
 description = "Sherlock: Find Usernames Across Social Networks"
 license = {text = "MIT License"}
 readme = "README.md"
