@@ -2,7 +2,8 @@ import sys
 from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 
 from colorama import init
-from utils import timeout_check
+
+from .utils import timeout_check
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
 __version__ = "0.14.2"

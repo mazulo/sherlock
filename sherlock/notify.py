@@ -8,7 +8,8 @@ import abc
 from typing import Optional
 
 from colorama import Fore, Style
-from result import QueryResult, QueryStatus
+
+from .result import QueryResult, QueryStatus
 
 globvar = 0  # global variable to count the number of results.
 

@@ -17,13 +17,13 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 import requests
-from argument_parser import parser
-from future_session import SherlockFuturesSession
-from notify import QueryNotify, QueryNotifyPrint
-from result import QueryResult, QueryStatus
-from sites import SitesInformation
 from torrequest import TorRequest
-from utils import (
+from .argument_parser import parser
+from .future_session import SherlockFuturesSession
+from .notify import QueryNotify, QueryNotifyPrint
+from .result import QueryResult, QueryStatus
+from .sites import SitesInformation
+from .utils import (
     check_for_parameter,
     get_response,
     handler,

@@ -9,6 +9,9 @@ networks.
 
 import sys
 
+from .sherlock import main
+
+
 if __name__ == "__main__":
     # Check if the user is using the correct version of Python
     python_version = sys.version.split()[0]
@@ -18,6 +21,5 @@ if __name__ == "__main__":
         print(f"You are using Python {python_version}, which is not supported by Sherlock")
         sys.exit(1)
 
-    from sherlock import sherlock
 
-    sherlock.main()
+    main()
