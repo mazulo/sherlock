@@ -16,8 +16,8 @@ if __name__ == "__main__":
     # Check if the user is using the correct version of Python
     python_version = sys.version.split()[0]
 
-    if sys.version_info < (3, 6):
-        print("Sherlock requires Python 3.6+")
+    if sys.version_info < (3, 7):
+        print("Sherlock requires Python 3.7+")
         print(f"You are using Python {python_version}, which is not supported by Sherlock")
         sys.exit(1)
 
