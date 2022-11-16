@@ -32,7 +32,7 @@ from .utils import (
 )
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
-__version__ = "0.15.2"
+__version__ = "0.15.0"
 
 
 def sherlock(  # noqa: C901

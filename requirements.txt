@@ -8,3 +8,4 @@ torrequest>=0.1.0
 pandas>=1.0.0
 openpyxl<=3.0.10
 pytest>7.0.0
+python-semantic-release==7.28.0

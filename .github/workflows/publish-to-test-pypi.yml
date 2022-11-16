@@ -22,13 +22,18 @@ jobs:
           python-version: "3.10"
           cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install dependencies 📦
         run: |
           python -m pip install --upgrade pip setuptools wheel twine
           pip install -r requirements.txt
 
-      - name: Build a binary wheel and a source tarball
-        run: python setup.py sdist bdist_wheel
+      - name: Use Python Semantic Release to prepare release 🚀
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          semantic-release publish
 
       - name: Publish distribution 📦 to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

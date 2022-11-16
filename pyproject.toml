@@ -1,6 +1,6 @@
-[project]
+[tool.poetry]
 name = "sherlock-hunt"
-version = "0.15.2"
+version = "0.15.0"
 description = "Sherlock: Find Usernames Across Social Networks"
 license = {text = "MIT License"}
 readme = "README.md"
@@ -22,3 +22,16 @@ classifiers = [
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.semantic_release]
+version_variable = [
+    "sherlock/sherlock.py:__version__",
+    "pyproject.toml:version",
+]
+branch = "master"
+changelog_file = "CHANGELOG.md"
+dist_path = "dist/"
+upload_to_release = true
+upload_to_pypi = false
+remove_dist = false
+patch_without_tag = true
